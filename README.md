@@ -9,10 +9,13 @@
 $inspire - Sends a random quote fetched from https://zenquotes.io/
 ```
 ```
-$new<space><encouraging message> - Adds the encouraging message to lists of encouraging messages
+$new<space><encouraging message> - Adds the encouraging message to lists of encouraging messages in the database
 ```
 ```
 $del<index> - Deletes encouraging message at given index
+```
+```
+$list - Shows the list of encouraging messages available in the database
 ```
 ```
 $responding<space><true/false> - Turns On/Off responding to sad messages

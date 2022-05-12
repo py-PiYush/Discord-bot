@@ -4,6 +4,7 @@ import requests
 import json
 import random
 from replit import db
+from keep_alive import keep_alive
 
 client = discord.Client()
 
@@ -12,6 +13,9 @@ client = discord.Client()
 sad_words = ['sad', 'depressed', 'unhappy', 'angry', 'miserable', 'failure', 'fail', 'depressing', 'bad', 'awful']
 
 starter_encouragements=['Cheer up!', 'Hang in there.', 'You are a great person!']
+
+if 'responding' not in db.keys():
+  db['responding'] = True
 
 def get_quote():
   '''
@@ -45,6 +49,7 @@ def delete_encouragement(index):
   else:
     return 0
 
+
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
@@ -59,13 +64,13 @@ async def on_message(message):
   if msg.startswith('$inspire'):
     quote = get_quote()
     await message.channel.send(quote)
-
-  options = starter_encouragements
-  if 'encouragements' in db.keys():
-    options = options + list(db['encouragements'])
-  
-  if any(word in msg for word in sad_words):
-    await message.channel.send(random.choice(options))
+  if db['responding']:
+    options = starter_encouragements
+    if 'encouragements' in db.keys():
+      options = options + list(db['encouragements'])
+    
+    if any(word in msg for word in sad_words):
+      await message.channel.send(random.choice(options))
 
   if msg.startswith('$new'):
     en_msg = msg.split('$new ', 1)[1]
@@ -84,9 +89,33 @@ async def on_message(message):
         await message.channel.send(f'Index limit: 0 - {len(encouragements)-1}')
     else:
       await message.channel.send(encouragements)
-    
+
+  if msg.startswith('$list'):
+    encouragements = []
+    if 'encouragements' in db.keys():
+      encouragements = db['encouragements']
+    await message.channel.send(list(encouragements))
+
+
+  if msg.startswith('$responding'):
+    value = msg.split('$responding ',1)[1]
+
+    if value.lower() == 'true':
+      db['responding'] = True
+      await message.channel.send('Responding is On!')
+
+    elif value.lower() == 'false':
+      db['responding'] = False
+      await message.channel.send('Responding is Off!')
+
+    else:
+      await message.channel.send('Enter only true/false')
+
+
   
 my_secret = os.environ['TOKEN']
+
+keep_alive()
 client.run(my_secret)
 
 
